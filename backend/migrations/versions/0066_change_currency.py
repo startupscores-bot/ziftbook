@@ -25,10 +25,12 @@ statement, so it refuses to run outside READ COMMITTED, as keep_an_owner does (0
 Accepted, at most once per business and only before its first booking:
 - A booking or service insert racing a change can fail once on its foreign key, or deadlock against
   the cascade (booking creation reads the service FOR SHARE, then takes the business's row).
-- A client who opened the booking page before the change, and books after it, is booked at the
-  number they saw in the new currency: the booking snapshots the service as it is at insert, and
-  the booking request carries no price or currency to compare with. Closing it needs the page to
-  send the currency it showed (a booking-page change, left to the settings-screen work, PR G).
+
+Closed in the API: a client who opened the booking page before the change and books after it is
+refused (409 currency_changed), because the page sends the currency it showed (app/bookings.py,
+create()'s shown_currency) and the booking compares it with the service it reads FOR SHARE. Only a
+page loaded from the previous release, which sends none, can still book at the number it showed in
+the new currency, during the rollout.
 
 Preflight: the upgrade refuses, naming the problem, while any business holds a currency outside the
 four (possible before this release, whose check was only three capital letters): the NOT VALID check
