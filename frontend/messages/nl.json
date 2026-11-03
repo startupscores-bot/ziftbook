@@ -618,7 +618,8 @@
       }
     },
     "clients": {
-      "comingSoon": "Je klanten komen binnenkort."
+      "comingSoon": "Je klanten komen binnenkort.",
+      "erased": "Gewiste klant"
     },
     "settings": {
       "bookingPageHeading": "Boekingspagina",

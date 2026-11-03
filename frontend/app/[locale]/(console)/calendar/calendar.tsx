@@ -16,7 +16,7 @@ import {
 } from "@/api-client";
 import { Link, useRouter } from "@/i18n/navigation";
 import { closedDay, closedDetail, daySlices, dayWindow, hourRange, hrefFor, type CalendarView, lanes, monToSun, nowTop, type Panel, parseView, type Slice, spanTimes, switchDate, type View, visibleDays, weekdayOf } from "@/lib/calendar";
-import { canAnswerRequests, dateLocale, type Role } from "@/lib/console";
+import { canAnswerRequests, clientLabel, dateLocale, type Role } from "@/lib/console";
 import { type Locale, type NameMap, serviceName } from "@/lib/services";
 import { messageShown, slotAt } from "@/lib/new-booking";
 import { addDaysISO, localDateISO, localTime, localToInstant } from "@/lib/time-off";
@@ -24,7 +24,7 @@ import { agendaPhase, blockLabel, mergeAgenda, nowLineAt } from "@/lib/today";
 
 import { useConsole } from "../../_ui/console";
 import styles from "../../_ui/console.module.css";
-import { Heading, problem } from "../../_ui/parts";
+import { ClientName, Heading, problem } from "../../_ui/parts";
 import uiStyles from "../../_ui/ui.module.css";
 import { chipOf, LoadFailure, Skeleton } from "../today";
 import { BlockPanel } from "./block-panel";
@@ -57,6 +57,7 @@ export function Calendar() {
   const today = useTranslations("Console.today");
   const nav = useTranslations("Console.nav");
   const person = useTranslations("Console.person");
+  const clients = useTranslations("Console.clients");
   const locale = useLocale();
   const tz = settings.timezone;
   const isOwner = session.role === "owner";
@@ -323,7 +324,7 @@ export function Calendar() {
     const name = t("itemLabel", {
       start: localTime(booking.starts_at, tz),
       end: localTime(booking.ends_at, tz),
-      client: booking.client_name,
+      client: clientLabel(booking, clients("erased")),
       service: serviceOf(booking),
       status: chip ? today(chip.word) : booking.status,
     });
@@ -349,7 +350,7 @@ export function Calendar() {
         >
           <b>
             {icon}
-            {booking.client_name}
+            <ClientName booking={booking} />
           </b>
           {short ? (
             second.length > 0 && <span>{` · ${second.join(" · ")}`}</span>
@@ -427,7 +428,7 @@ export function Calendar() {
                   <small>{today("minutes", { n: Math.round((item.end - item.start) / 60_000) })}</small>
                 </div>
                 <div className={styles.agendaWhat}>
-                  {booking.client_name}
+                  <ClientName booking={booking} />
                   <span>{[serviceOf(booking), ...meta].join(" · ")}</span>
                 </div>
                 {chip ? (
